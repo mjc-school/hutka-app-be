@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Lambda application that calls the Lambda API.
+
+Globals:
+  Function:
+    Runtime: java11
+    Timeout: 10
+    MemorySize: 512
+    Tracing: Active
+  Api:
+    Cors:
+      AllowOrigin: "'*'"
+      AllowHeaders: "'Content-Type,X-WARM-UP,X-Amz-Date,Authorization,X-Api-Key'"
+
+Resources:
+  GetRouteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: by.epam.handlers.GetRoutesHandler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonDynamoDBFullAccess
+      Events:
+        GetRouteApi:
+          Type: Api
+          Properties:
+            Path: /get-route
+            Method: GET
+
+  SaveRouteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: by.epam.handlers.SaveRouteHandler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonDynamoDBFullAccess
+      Events:
+        SaveRouteApi:
+          Type: Api
+          Properties:
+            Path: /save-route
+            Method: POST
+
+  RoutesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "Routes"
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
