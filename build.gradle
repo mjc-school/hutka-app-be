@@ -8,9 +8,9 @@ repositories {
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.amazonaws.serverless:aws-serverless-java-container-core:1.4'
-    implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
-    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.11.670'
+    compile 'com.amazonaws.serverless:aws-serverless-java-container-core:1.4'
+    compile 'com.amazonaws:aws-lambda-java-core:1.2.1'
+    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.670'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:3.3.3'
