@@ -1,6 +1,6 @@
-package by.epam.model.dao;
+package by.mjc.model.dao;
 
-import by.epam.model.entities.Route;
+import by.mjc.model.entities.Route;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
@@ -10,35 +10,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RoutesDao
-{
+public class RoutesDao {
     private AmazonDynamoDB dynamoDBClient;
 
-    public RoutesDao(AmazonDynamoDB dynamoDBClient)
-    {
+    public RoutesDao(AmazonDynamoDB dynamoDBClient) {
         this.dynamoDBClient = dynamoDBClient;
     }
 
-    public void save(Route route)
-    {
+    public void save(Route route) {
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
         mapper.save(route);
     }
 
-    public List<Route> getAll()
-    {
+    public List<Route> getAll() {
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
 
         return mapper.scan(Route.class, scanExpression);
     }
 
-    private Map<String, AttributeValue> getExpressionAttributes(List<String> tags)
-    {
+    private Map<String, AttributeValue> getExpressionAttributes(List<String> tags) {
         Map<String, AttributeValue> expressionAttributes = new HashMap<>();
 
-        for(int i = 0; i < tags.size(); i++)
-        {
+        for (int i = 0; i < tags.size(); i++) {
             String attributeAlias = String.format(":tag%d", i + 1);
             expressionAttributes.put(attributeAlias, new AttributeValue().withS(tags.get(i)));
         }
@@ -46,23 +40,19 @@ public class RoutesDao
         return expressionAttributes;
     }
 
-    private String getTagFilterExpression(String attributeAlias)
-    {
+    private String getTagFilterExpression(String attributeAlias) {
         return String.format("contains(tags, %s)", attributeAlias);
     }
 
-    private String getTagsFilterExpression(Map<String, AttributeValue> expressionAttributes)
-    {
+    private String getTagsFilterExpression(Map<String, AttributeValue> expressionAttributes) {
         return expressionAttributes.keySet().stream()
                 .map(this::getTagFilterExpression)
                 .reduce((s1, s2) -> s1 + " AND " + s2)
                 .orElse("");
     }
 
-    public List<Route> getByTags(List<String> tags)
-    {
-        if(tags.size() == 0)
-        {
+    public List<Route> getByTags(List<String> tags) {
+        if (tags.isEmpty()){
             return getAll();
         }
 
@@ -76,8 +66,7 @@ public class RoutesDao
         return mapper.scan(Route.class, scanExpression);
     }
 
-    public void delete(Route route)
-    {
+    public void delete(Route route) {
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
         mapper.delete(route);
     }

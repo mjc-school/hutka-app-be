@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'checkstyle'
 }
 
 repositories {
@@ -7,10 +8,14 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.8.2'
-    compile 'com.amazonaws.serverless:aws-serverless-java-container-core:1.4'
-    compile 'com.amazonaws:aws-lambda-java-core:1.2.1'
-    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.670'
+    implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
+    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.11.670'
+
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.16'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:3.3.3'
@@ -21,3 +26,13 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+}
+
+build.dependsOn buildZip
