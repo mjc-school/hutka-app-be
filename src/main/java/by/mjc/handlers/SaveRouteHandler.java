@@ -4,21 +4,14 @@ import by.mjc.model.entities.Route;
 import by.mjc.model.services.RoutesService;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-public class SaveRouteHandler implements RequestHandler<SaveRouteHandler.SaveRouteRequest, String> {
-    @Data
-    @NoArgsConstructor
-    public static class SaveRouteRequest {
-        private Route route;
-    }
+public class SaveRouteHandler implements RequestHandler<Route, String> {
 
-    private RoutesService routesService = new RoutesService();
+    private final RoutesService routesService = new RoutesService();
 
     @Override
-    public String handleRequest(SaveRouteRequest request, Context context) {
-        routesService.saveRoute(request.getRoute());
+    public String handleRequest(Route route, Context context) {
+        routesService.saveRoute(route);
         return "Route saved";
     }
 }

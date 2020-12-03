@@ -1,7 +1,5 @@
 package by.mjc.handlers;
 
-import java.util.List;
-
 import by.mjc.model.entities.Route;
 import by.mjc.model.services.RoutesService;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -9,18 +7,20 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-public class GetRoutesHandler implements RequestHandler<GetRoutesHandler.GetRoutesRequest, List<Route>> {
+import java.util.List;
+
+public class SearchRoutesHandler implements RequestHandler<SearchRoutesHandler.SearchRoutesRequest, List<Route>> {
 
     @Data
     @NoArgsConstructor
-    public static class GetRoutesRequest {
+    public static class SearchRoutesRequest {
         private List<String> tags;
     }
 
-    private RoutesService routesService = new RoutesService();
+    private final RoutesService routesService = new RoutesService();
 
     @Override
-    public List<Route> handleRequest(GetRoutesRequest request, Context context) {
+    public List<Route> handleRequest(SearchRoutesRequest request, Context context) {
         return routesService.getRoutesByTags(request.getTags());
     }
 }
