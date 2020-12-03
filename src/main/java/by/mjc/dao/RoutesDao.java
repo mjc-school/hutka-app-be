@@ -1,6 +1,6 @@
-package by.mjc.model.dao;
+package by.mjc.dao;
 
-import by.mjc.model.entities.Route;
+import by.mjc.entities.Route;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RoutesDao {
-    private AmazonDynamoDB dynamoDBClient;
+    private final AmazonDynamoDB dynamoDBClient;
 
     public RoutesDao(AmazonDynamoDB dynamoDBClient) {
         this.dynamoDBClient = dynamoDBClient;
@@ -52,7 +52,7 @@ public class RoutesDao {
     }
 
     public List<Route> getByTags(List<String> tags) {
-        if (tags.isEmpty()){
+        if (tags.isEmpty()) {
             return getAll();
         }
 

@@ -1,26 +1,20 @@
 package by.mjc.handlers;
 
-import by.mjc.model.entities.Route;
-import by.mjc.model.services.RoutesService;
+import by.mjc.entities.Route;
+import by.mjc.entities.SearchRoutesRequest;
+import by.mjc.services.RoutesService;
+import by.mjc.utils.AwsClientFactory;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-public class SearchRoutesHandler implements RequestHandler<SearchRoutesHandler.SearchRoutesRequest, List<Route>> {
+public class SearchRoutesHandler implements RequestHandler<SearchRoutesRequest, List<Route>> {
 
-    @Data
-    @NoArgsConstructor
-    public static class SearchRoutesRequest {
-        private List<String> tags;
-    }
-
-    private final RoutesService routesService = new RoutesService();
+    private final RoutesService routesService = new RoutesService(AwsClientFactory.getInstance().getDynamoDBClient());
 
     @Override
     public List<Route> handleRequest(SearchRoutesRequest request, Context context) {
-        return routesService.getRoutesByTags(request.getTags());
+        return routesService.getRoutesByTags(request);
     }
 }

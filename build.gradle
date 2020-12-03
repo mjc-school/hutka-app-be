@@ -5,6 +5,9 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://s3-us-west-2.amazonaws.com/dynamodb-local/release"
+    }
 }
 
 dependencies {
@@ -19,7 +22,22 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:3.3.3'
+    testImplementation 'com.amazonaws:DynamoDBLocal:1.13.5'
 
+}
+
+task copyNativeDeps(type: Copy) {
+    from (configurations.testCompile) {
+        include "*.dylib"
+        include "*.so"
+        include "*.dll"
+    }
+    into 'build/libs'
+}
+
+test.dependsOn copyNativeDeps
+test.doFirst {
+    systemProperty "java.library.path", 'build/libs'
 }
 
 java {
@@ -44,7 +62,7 @@ wrapper {
 jar {
     manifest {
     }
-from compileJava
+    from compileJava
     from processResources
     into('lib') {
         from configurations.runtimeClasspath
