@@ -20,14 +20,16 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.16'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     testImplementation 'org.mockito:mockito-core:3.3.3'
     testImplementation 'com.amazonaws:DynamoDBLocal:1.13.5'
 
 }
 
 task copyNativeDeps(type: Copy) {
-    from (configurations.testCompile) {
+    from(configurations.testCompile) {
         include "*.dylib"
         include "*.so"
         include "*.dll"
@@ -49,10 +51,10 @@ checkstyle {
     toolVersion '8.21'
 }
 checkstyleMain {
-    source ='src/main/java'
+    source = 'src/main/java'
 }
 checkstyleTest {
-    source ='src/test/java'
+    source = 'src/test/java'
 }
 
 wrapper {
