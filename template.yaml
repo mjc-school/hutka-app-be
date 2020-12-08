@@ -14,11 +14,11 @@ Globals:
       AllowHeaders: "'Content-Type,X-WARM-UP,X-Amz-Date,Authorization,X-Api-Key'"
 
 Resources:
-  GetRouteFunction:
+  SearchRoutesFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: by.mjc.handlers.GetRoutesHandler
+      Handler: by.mjc.handlers.SearchRoutesHandler
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
@@ -26,10 +26,10 @@ Resources:
         - AWSLambdaVPCAccessExecutionRole
         - AmazonDynamoDBFullAccess
       Events:
-        GetRouteApi:
+        SearchRoutesApi:
           Type: Api
           Properties:
-            Path: /get-route
+            Path: /search-routes
             Method: GET
 
   SaveRouteFunction:

@@ -50,7 +50,7 @@ public class RoutesServiceTest {
         List<Route> routes = routesService.getRoutesByTags(request);
         List<String> idsToExpect = Arrays.stream(scenario.get(scenario.size() - 1).split(" "))
                 .filter(id -> !id.equals("null")).collect(Collectors.toList());
-        assertEquals(idsToExpect, routes.stream().map(Route::getId).collect(Collectors.toList()));
+        assertEquals(new HashSet<>(idsToExpect), new HashSet<>(routes.stream().map(Route::getId).collect(Collectors.toList())));
     }
 
     private static void createTable(AmazonDynamoDB ddb, String tableName, String hashKeyName) {

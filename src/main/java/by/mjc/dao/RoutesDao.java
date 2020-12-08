@@ -5,10 +5,12 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import org.json.XML;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class RoutesDao {
     private final AmazonDynamoDB dynamoDBClient;
@@ -17,27 +19,28 @@ public class RoutesDao {
         this.dynamoDBClient = dynamoDBClient;
     }
 
+    private String xmlToJson(String xml) {
+        return XML.toJSONObject(xml).toString();
+    }
+
     public void save(Route route) {
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
+        route.setKmlAsJson(xmlToJson(route.getKml()));
         mapper.save(route);
     }
 
     public List<Route> getAll() {
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
-
         return mapper.scan(Route.class, scanExpression);
     }
 
     private Map<String, AttributeValue> getExpressionAttributes(List<String> tags) {
-        Map<String, AttributeValue> expressionAttributes = new HashMap<>();
-
-        for (int i = 0; i < tags.size(); i++) {
-            String attributeAlias = String.format(":tag%d", i + 1);
-            expressionAttributes.put(attributeAlias, new AttributeValue().withS(tags.get(i)));
-        }
-
-        return expressionAttributes;
+        AtomicInteger i = new AtomicInteger(1);
+        return tags.stream()
+                .collect(Collectors.toMap(
+                        tag -> String.format(":tag%d", i.getAndIncrement()),
+                        tag -> new AttributeValue().withS(tag)));
     }
 
     private String getTagFilterExpression(String attributeAlias) {
@@ -47,7 +50,7 @@ public class RoutesDao {
     private String getTagsFilterExpression(Map<String, AttributeValue> expressionAttributes) {
         return expressionAttributes.keySet().stream()
                 .map(this::getTagFilterExpression)
-                .reduce((s1, s2) -> s1 + " AND " + s2)
+                .reduce((s1, s2) -> s1 + " OR " + s2)
                 .orElse("");
     }
 
