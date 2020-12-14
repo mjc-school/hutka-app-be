@@ -4,14 +4,28 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
     maven {
         url "https://s3-us-west-2.amazonaws.com/dynamodb-local/release"
     }
+    maven {
+        url "https://repo.osgeo.org/repository/release/"
+    }
+    maven {
+        url "https://repo.osgeo.org/repository/snapshot/"
+    }
+
+    // Don't swap!!!
+
+    mavenCentral()
 }
 
 dependencies {
-    implementation 'org.json:json:20171018'
+    implementation 'org.geotools:gt-main:25-SNAPSHOT'
+    implementation 'org.geotools.xsd:gt-xsd-core:25-SNAPSHOT'
+    implementation 'org.geotools.xsd:gt-xsd-kml:25-SNAPSHOT'
+    implementation 'org.geotools:gt-geojson:25-SNAPSHOT'
+    implementation 'org.geotools:gt-xml:25-SNAPSHOT'
+    implementation 'javax.media:jai_core:1.1.3'
 
     compile 'com.amazonaws:aws-lambda-java-core:1.2.1'
     compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.670'

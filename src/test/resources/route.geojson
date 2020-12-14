@@ -1,0 +1,89 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.949454,
+          52.682218
+        ]
+      },
+      "properties": {
+        "name": "Выгонощанское",
+        "description": "Беларусь, Брестская область, Ивацевичский район, Телеханский сельсовет, озеро Выгонощанское",
+        "icon-opacity": 1,
+        "icon-color": "#56db40",
+        "icon-offset": [
+          56,
+          28
+        ],
+        "icon": "https://api-maps.yandex.ru/i/0.4/micro/pmgns.png"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.121675,
+          52.765616
+        ]
+      },
+      "properties": {
+        "name": "Дворец Пусловских",
+        "description": "Дворец Пусловских: https://34travel.me/gotobelarus/post/gotika",
+        "icon-opacity": 1,
+        "icon-color": "#ff931e",
+        "icon-offset": [
+          7,
+          28
+        ],
+        "icon": "https://api-maps.yandex.ru/i/0.4/micro/pmors.png"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.895641,
+          52.859966
+        ]
+      },
+      "properties": {
+        "name": "Музей Ружанский дворцовый комплекс Сапегов",
+        "description": "Руины дворца Сапег: https://34travel.me/gotobelarus/post/10-krasivyh-mest-belarusi",
+        "icon-opacity": 1,
+        "icon-color": "#ff931e",
+        "icon-offset": [
+          7,
+          28
+        ],
+        "icon": "https://api-maps.yandex.ru/i/0.4/micro/pmors.png"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.363829,
+          52.936946
+        ]
+      },
+      "properties": {
+        "name": "Порозово",
+        "description": "https://34travel.me/gotobelarus/post/derevyannaya-arhitekruta-belarusi<br/>Беларусь, Гродненская область, Свислочский район, городской посёлок Порозово",
+        "icon-opacity": 1,
+        "icon-color": "#ff931e",
+        "icon-offset": [
+          7,
+          28
+        ],
+        "icon": "https://api-maps.yandex.ru/i/0.4/micro/pmors.png"
+      }
+    }
+  ]
+}

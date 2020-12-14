@@ -21,4 +21,8 @@ public class RoutesService {
     public List<Route> getRoutesByTags(SearchRoutesRequest request) {
         return routesDao.getByTags(request.getTags());
     }
+
+    public Route getRoute(String id) {
+        return routesDao.get(id);
+    }
 }

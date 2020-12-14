@@ -3,6 +3,7 @@ package by.mjc.handlers;
 import by.mjc.entities.Route;
 import by.mjc.entities.SearchRoutesRequest;
 import by.mjc.services.RoutesService;
+import by.mjc.utils.GeoParser;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.local.shared.access.AmazonDynamoDBLocal;
@@ -10,13 +11,20 @@ import com.amazonaws.services.dynamodbv2.model.*;
 import init.AwsDynamoDbLocalTestUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +46,29 @@ public class RoutesServiceTest {
     @AfterAll
     public static void tearDownClass() {
         amazonDynamoDBLocal.shutdown();
+    }
+
+    private String getFileAsString(String fileName) throws IOException, URISyntaxException {
+        URI uri = getClass().getClassLoader().getResource(fileName).toURI();
+         return Files.readString(Paths.get(uri), StandardCharsets.UTF_8);
+    }
+
+    // Parser adds an id, doesn't add style. Incorrectly parses Folder tag
+    @Test
+    public void testGeoJsonParser() throws IOException, URISyntaxException {
+        RoutesService routesService = new RoutesService(amazonDynamoDBLocal.amazonDynamoDB());
+        String kml = getFileAsString("route.kml");
+        routesService.saveRoute(Route.builder()
+                .id("4815")
+                .kml(kml)
+                .build());
+
+        Route route = routesService.getRoute("4815");
+        String expectedGeoJson = getFileAsString("route.geojson")
+                .replaceAll("[\n\r]", "")
+                .replaceAll("\\s+", "");
+
+        assertEquals(expectedGeoJson, route.getGeoJson());
     }
 
     @ParameterizedTest(name = "#{index} - match search?")

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+    <Document>
+        <ExtendedData>
+            <Data name="creator">
+                <value><![CDATA[Yandex Map Constructor]]></value>
+            </Data>
+        </ExtendedData>
+        <name><![CDATA[Belarus SW]]></name>
+        <description/>
+        <Folder>
+            <Placemark>
+                <name><![CDATA[Выгонощанское]]></name>
+                <description>
+                    <![CDATA[Беларусь, Брестская область, Ивацевичский район, Телеханский сельсовет, озеро Выгонощанское]]></description>
+                <Style>
+                    <IconStyle>
+                        <color>ff40db56</color>
+                        <Icon>
+                            <href>https://api-maps.yandex.ru/i/0.4/micro/pmgns.png</href>
+                        </Icon>
+                        <hotSpot x="56" y="28" xunits="pixels" yunits="insetPixels"/>
+                    </IconStyle>
+                </Style>
+                <Point>
+                    <coordinates>25.949454,52.682218</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark>
+                <name><![CDATA[Дворец Пусловских]]></name>
+                <description><![CDATA[Дворец Пусловских: https://34travel.me/gotobelarus/post/gotika]]></description>
+                <Style>
+                    <IconStyle>
+                        <color>ff1e93ff</color>
+                        <Icon>
+                            <href>https://api-maps.yandex.ru/i/0.4/micro/pmors.png</href>
+                        </Icon>
+                        <hotSpot x="7" y="28" xunits="pixels" yunits="insetPixels"/>
+                    </IconStyle>
+                </Style>
+                <Point>
+                    <coordinates>25.121675,52.765616</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark>
+                <name><![CDATA[Музей Ружанский дворцовый комплекс Сапегов]]></name>
+                <description>
+                    <![CDATA[Руины дворца Сапег: https://34travel.me/gotobelarus/post/10-krasivyh-mest-belarusi]]></description>
+                <Style>
+                    <IconStyle>
+                        <color>ff1e93ff</color>
+                        <Icon>
+                            <href>https://api-maps.yandex.ru/i/0.4/micro/pmors.png</href>
+                        </Icon>
+                        <hotSpot x="7" y="28" xunits="pixels" yunits="insetPixels"/>
+                    </IconStyle>
+                </Style>
+                <Point>
+                    <coordinates>24.895641,52.859966</coordinates>
+                </Point>
+            </Placemark>
+            <Placemark>
+                <name><![CDATA[Порозово]]></name>
+                <description>
+                    <![CDATA[https://34travel.me/gotobelarus/post/derevyannaya-arhitekruta-belarusi<br/>Беларусь, Гродненская область, Свислочский район, городской посёлок Порозово]]></description>
+                <Style>
+                    <IconStyle>
+                        <color>ff1e93ff</color>
+                        <Icon>
+                            <href>https://api-maps.yandex.ru/i/0.4/micro/pmors.png</href>
+                        </Icon>
+                        <hotSpot x="7" y="28" xunits="pixels" yunits="insetPixels"/>
+                    </IconStyle>
+                </Style>
+                <Point>
+                    <coordinates>24.363829,52.936946</coordinates>
+                </Point>
+            </Placemark>
+        </Folder>
+    </Document>
+</kml>

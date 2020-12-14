@@ -1,12 +1,16 @@
 package by.mjc.dao;
 
 import by.mjc.entities.Route;
+import by.mjc.utils.GeoParser;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import org.json.XML;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,14 +23,19 @@ public class RoutesDao {
         this.dynamoDBClient = dynamoDBClient;
     }
 
-    private String xmlToJson(String xml) {
-        return XML.toJSONObject(xml).toString();
-    }
-
     public void save(Route route) {
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
-        route.setKmlAsJson(xmlToJson(route.getKml()));
+        try {
+            route.setGeoJson(GeoParser.kmlToGeoJson(route.getKml()));
+        } catch (XMLStreamException | SAXException | IOException e) {
+            //
+        }
         mapper.save(route);
+    }
+
+    public Route get(String id) {
+        DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
+        return mapper.load(Route.class, id);
     }
 
     public List<Route> getAll() {
