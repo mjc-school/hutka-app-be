@@ -25,3 +25,9 @@ hs_err_pid*
 .aws-sam
 build
 .gradle
+out
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
