@@ -48,16 +48,6 @@ java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
-checkstyle {
-    configFile file('config/checkstyle/checkstyle.xml')
-    toolVersion '8.21'
-}
-checkstyleMain {
-    source = 'src/main/java'
-}
-checkstyleTest {
-    source = 'src/test/java'
-}
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
