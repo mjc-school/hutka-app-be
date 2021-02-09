@@ -1,0 +1,4 @@
+id, name, description, length, time, imageUrl, pointId
+1, route1, some description1, 100км, 3h, url, 1; 2; 3
+2, тестовый2,какое никакое описание2,200км, 3h, url, 1; 4; 5
+3,,,,,,

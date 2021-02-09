@@ -5,7 +5,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import org.json.XML;
 
 import java.util.List;
 import java.util.Map;
@@ -18,14 +17,8 @@ public class RoutesDao {
     public RoutesDao(AmazonDynamoDB dynamoDBClient) {
         this.dynamoDBClient = dynamoDBClient;
     }
-
-    private String xmlToJson(String xml) {
-        return XML.toJSONObject(xml).toString();
-    }
-
     public void save(Route route) {
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
-        route.setKmlAsJson(xmlToJson(route.getKml()));
         mapper.save(route);
     }
 

@@ -1,18 +1,24 @@
-plugins {
-    id 'java'
-}
 
 repositories {
-    mavenCentral()
     maven {
         url "https://s3-us-west-2.amazonaws.com/dynamodb-local/release"
     }
 }
 
 dependencies {
-    implementation project(':common-classes')
-    compile 'com.amazonaws:aws-lambda-java-core:1.2.1'
+    compile 'org.apache.poi:poi-ooxml:4.1.0'
+    compile project(':common-classes')
     testCompile 'com.amazonaws:DynamoDBLocal:1.13.5'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "by.mjc.app.Application"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 task copyNativeDeps(type: Copy) {
@@ -27,14 +33,4 @@ task copyNativeDeps(type: Copy) {
 test.dependsOn copyNativeDeps
 test.doFirst {
     systemProperty "java.library.path", 'build/libs'
-}
-
-jar {
-    manifest {
-    }
-    from compileJava
-    from processResources
-    into('lib') {
-        from configurations.runtimeClasspath
-    }
 }
