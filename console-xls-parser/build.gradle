@@ -8,6 +8,7 @@ repositories {
 dependencies {
     compile 'org.apache.poi:poi-ooxml:4.1.0'
     compile project(':common-classes')
+    testCompile project(':common-classes').sourceSets.test.output
     testCompile 'com.amazonaws:DynamoDBLocal:1.13.5'
 }
 

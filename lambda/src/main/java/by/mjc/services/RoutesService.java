@@ -1,24 +1,44 @@
 package by.mjc.services;
 
 import by.mjc.dao.RoutesDao;
+import by.mjc.entities.Place;
 import by.mjc.entities.Route;
 import by.mjc.entities.SearchRoutesRequest;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RoutesService {
     private final RoutesDao routesDao;
 
-    public RoutesService(AmazonDynamoDB dynamoDBClient) {
-        this.routesDao = new RoutesDao(dynamoDBClient);
+    public RoutesService(RoutesDao routesDao) {
+        this.routesDao = routesDao;
     }
 
-    public void saveRoute(Route route) {
-        routesDao.save(route);
+    public List<Place> getAllPlaces() {
+        return routesDao.getAllPlaces();
     }
 
     public List<Route> getRoutesByTags(SearchRoutesRequest request) {
-        return routesDao.getByTags(request.getTags());
+        List<String> tags = request.getTags();
+        List<Route> routes = routesDao.getByTags(tags);
+
+        if(!tags.isEmpty()) {
+            return routes.stream()
+                    .filter(route -> !route.getPoints().isEmpty())
+                    .filter(route -> hasMoreThanTwoTags(route, tags))
+                    .collect(Collectors.toList());
+        }
+
+        return routes;
+    }
+
+    private boolean hasMoreThanTwoTags(Route route, List<String> tags) {
+        long numberOfTags = route.getTags().stream()
+                .filter(tags::contains)
+                .limit(2)
+                .count();
+
+        return numberOfTags >= 2;
     }
 }

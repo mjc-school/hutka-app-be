@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation project(':common-classes')
     compile 'com.amazonaws:aws-lambda-java-core:1.2.1'
+    testCompile project(':common-classes').sourceSets.test.output
     testCompile 'com.amazonaws:DynamoDBLocal:1.13.5'
 }
 

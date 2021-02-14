@@ -1,0 +1,4 @@
+tags, expected routeIds, comments
+История; Природа,1; 2,                      routes that contains one of this tags
+Архитектура; еда, 1; 2,                     routes that contains one of this tags
+, 1; 2; 3,                                  empty search returns all routes

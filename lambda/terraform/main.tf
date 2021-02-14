@@ -114,13 +114,13 @@ resource "aws_iam_role" "read_role" {
 }
 
 
-resource "aws_lambda_function" "save_route_lambda" {
+resource "aws_lambda_function" "search_places_lambda" {
 
-  function_name = "SaveRouteLambda"
+  function_name = "SearchPlacesLambda"
   runtime = var.lambda_runtime
   filename = var.lambda_payload_filename
   role = aws_iam_role.write_role.arn
-  handler = "by.mjc.handlers.SaveRouteHandler"
+  handler = "by.mjc.handlers.SearchPlacesHandler"
   timeout = var.lambda_timeout
   memory_size = var.lambda_memory
 }
@@ -144,17 +144,17 @@ resource "aws_api_gateway_rest_api" "api_lambda" {
 }
 
 
-resource "aws_api_gateway_resource" "save_route_resource" {
+resource "aws_api_gateway_resource" "search_places_resource" {
   rest_api_id = aws_api_gateway_rest_api.api_lambda.id
   parent_id = aws_api_gateway_rest_api.api_lambda.root_resource_id
-  path_part = var.save_route_path
+  path_part = var.search_places_path
 
 }
 
 
-resource "aws_api_gateway_method" "save_route_method" {
+resource "aws_api_gateway_method" "search_places_method" {
   rest_api_id = aws_api_gateway_rest_api.api_lambda.id
-  resource_id = aws_api_gateway_resource.save_route_resource.id
+  resource_id = aws_api_gateway_resource.search_places_resource.id
   http_method = "POST"
   authorization = "NONE"
 }
@@ -176,14 +176,14 @@ resource "aws_api_gateway_method" "search_routes_method" {
 }
 
 
-resource "aws_api_gateway_integration" "save_route_integration" {
+resource "aws_api_gateway_integration" "search_places_integration" {
   rest_api_id = aws_api_gateway_rest_api.api_lambda.id
-  resource_id = aws_api_gateway_resource.save_route_resource.id
-  http_method = aws_api_gateway_method.save_route_method.http_method
+  resource_id = aws_api_gateway_resource.search_places_resource.id
+  http_method = aws_api_gateway_method.search_places_method.http_method
 
   integration_http_method = "POST"
   type = "AWS_PROXY"
-  uri = aws_lambda_function.save_route_lambda.invoke_arn
+  uri = aws_lambda_function.search_places_lambda.invoke_arn
 
 }
 
@@ -202,7 +202,7 @@ resource "aws_api_gateway_integration" "search_routes_integration" {
 
 resource "aws_api_gateway_deployment" "api_deploy" {
   depends_on = [
-    aws_api_gateway_integration.save_route_integration,
+    aws_api_gateway_integration.search_places_integration,
     aws_api_gateway_integration.search_routes_integration]
 
   rest_api_id = aws_api_gateway_rest_api.api_lambda.id
@@ -210,13 +210,13 @@ resource "aws_api_gateway_deployment" "api_deploy" {
 }
 
 
-resource "aws_lambda_permission" "save_route_permission" {
+resource "aws_lambda_permission" "search_places_permission" {
   statement_id = "AllowExecutionFromAPIGateway"
   action = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.save_route_lambda.function_name
+  function_name = aws_lambda_function.search_places_lambda.function_name
   principal = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_api_gateway_rest_api.api_lambda.execution_arn}/${var.api_env_stage_name}/POST/${var.save_route_path}"
+  source_arn = "${aws_api_gateway_rest_api.api_lambda.execution_arn}/${var.api_env_stage_name}/POST/${var.search_places_path}"
 
 }
 

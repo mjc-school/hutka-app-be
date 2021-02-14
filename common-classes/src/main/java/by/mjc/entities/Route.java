@@ -16,13 +16,13 @@ public class Route {
     @Getter(onMethod = @__({@DynamoDBAttribute}))
     private String name;
     @Getter(onMethod = @__({@DynamoDBAttribute}))
+    private List<Place> points;
+    @Getter(onMethod = @__({@DynamoDBAttribute}))
+    private Position coords;
+    @Getter(onMethod = @__({@DynamoDBAttribute}))
+    private String imgUrl;
+    @Getter(onMethod = @__({@DynamoDBAttribute}))
+    private List<String> tags;
+    @Getter(onMethod = @__({@DynamoDBAttribute}))
     private String description;
-    @Getter(onMethod = @__({@DynamoDBAttribute}))
-    private String length;
-    @Getter(onMethod = @__({@DynamoDBAttribute}))
-    private String time;
-    @Getter(onMethod = @__({@DynamoDBAttribute}))
-    private String imageUrl;
-    @Getter(onMethod = @__({@DynamoDBAttribute}))
-    private List<Point> points;
 }

@@ -1,0 +1,5 @@
+tags, expected routeIds, comments
+История; Несуществующий тег,,                           only one tag matches
+Архитектура; еда, 1; 2,                                 routes that contains one of this tags
+, 1; 2; 3,                                              empty search returns all routes
+История; Архитектура; Еда, 1; 2; 3; 6,                  three tags

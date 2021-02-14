@@ -1,7 +1,6 @@
 package by.mjc.services;
 
-import by.mjc.entities.Point;
-import by.mjc.entities.Route;
+import by.mjc.entities.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -14,77 +13,56 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class XlsRoutesParser {
-    private enum RouteColumns {
-        ID(0), NAME(1), DESCRIPTION(2),
-        LENGTH(3), TIME(4), IMAGE_URL(5), POINT_ID(6);
+    public List<Route> parseXls(FileInputStream fis) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(fis);
+        XSSFSheet placesSheet = workbook.getSheet("Places");
+        XSSFSheet routesSheet = workbook.getSheet("Routes");
+        DataFormatter formatter = new DataFormatter();
+        Map<String, Place> pointsMap = new HashMap<>();
+        List<Route> routes = new ArrayList<>();
 
-        private final int index;
+        for (Row placesRow : placesSheet) {
+            if (isEmptyRow(placesRow, formatter) || placesRow.getRowNum() == 0) {
+                continue;
+            }
 
-        RouteColumns(int index) {
-            this.index = index;
+            Place place = getPlaceFromRow(placesRow, formatter);
+            pointsMap.put(place.getId(), place);
         }
 
-        public int getIndex() {
-            return index;
+        for (Row routesRow : routesSheet) {
+            if (isEmptyRow(routesRow, formatter) || routesRow.getRowNum() == 0) {
+                continue;
+            }
+
+            Route route = getRouteFromRow(routesRow, formatter);
+            routes.add(route);
+            List<String> placeIds = getPlaceIdsFromRoutesRow(routesRow, formatter);
+
+            placeIds.forEach(placeId -> {
+                Place place = pointsMap.get(placeId);
+                addPlaceToRoute(route, place);
+            });
+        }
+
+        return routes;
+    }
+
+    private void addPlaceToRoute(Route route, Place place) {
+        if (place != null) {
+            route.getPoints().add(place);
+            addPlaceTagsToRoute(route, place);
         }
     }
 
-    private enum PointColumns {
-        ID(0), REGION(1), SIGHT(2),
-        DESCRIPTION(3), IMAGE_URL(4), LATITUDE(5),
-        LONGITUDE(6), TAGS(7);
-
-        private final int index;
-
-        PointColumns(int index) {
-            this.index = index;
+    private void addPlaceTagsToRoute(Route route, Place place) {
+        if (place.getTags() != null) {
+            place.getTags().forEach(tag -> {
+                if (!route.getTags().contains(tag)) {
+                    route.getTags().add(tag);
+                }
+            });
         }
-
-        public int getIndex() {
-            return index;
-        }
-    }
-
-    private List<String> splitByComma(String values) {
-        return Arrays.stream(values.split(","))
-                .map(String::strip)
-                .collect(Collectors.toList());
-    }
-
-    private Point getPointFromRow(Row pointsRow, DataFormatter formatter) {
-        Double latitude = pointsRow.getCell(PointColumns.LATITUDE.getIndex()).getNumericCellValue();
-        Double longitude = pointsRow.getCell(PointColumns.LONGITUDE.getIndex()).getNumericCellValue();
-
-        if (latitude == 0.0) latitude = null;
-        if (longitude == 0.0) longitude = null;
-
-        return Point.builder()
-                .id(formatter.formatCellValue(pointsRow.getCell(PointColumns.ID.getIndex())))
-                .region(formatter.formatCellValue(pointsRow.getCell(PointColumns.REGION.getIndex())))
-                .sight(formatter.formatCellValue(pointsRow.getCell(PointColumns.SIGHT.getIndex())))
-                .description(formatter.formatCellValue(pointsRow.getCell(PointColumns.DESCRIPTION.getIndex())))
-                .imageUrl(formatter.formatCellValue(pointsRow.getCell(PointColumns.IMAGE_URL.getIndex())))
-                .latitude(latitude)
-                .longitude(longitude)
-                .tags(splitByComma(formatter.formatCellValue(pointsRow.getCell(PointColumns.TAGS.getIndex()))))
-                .build();
-    }
-
-    private Route getRouteFromRow(Row routesRow, DataFormatter formatter) {
-        return Route.builder()
-                .id(formatter.formatCellValue(routesRow.getCell(RouteColumns.ID.getIndex())))
-                .name(formatter.formatCellValue(routesRow.getCell(RouteColumns.NAME.getIndex())))
-                .description(formatter.formatCellValue(routesRow.getCell(RouteColumns.DESCRIPTION.getIndex())))
-                .length(formatter.formatCellValue(routesRow.getCell(RouteColumns.LENGTH.getIndex())))
-                .time(formatter.formatCellValue(routesRow.getCell(RouteColumns.TIME.getIndex())))
-                .imageUrl(formatter.formatCellValue(routesRow.getCell(RouteColumns.IMAGE_URL.getIndex())))
-                .points(new ArrayList<>())
-                .build();
-    }
-
-    private List<String> getPointIdsFromRoutesRow(Row routesRow, DataFormatter formatter) {
-        String pointIds = formatter.formatCellValue(routesRow.getCell(RouteColumns.POINT_ID.getIndex()));
-        return splitByComma(pointIds);
     }
 
     private boolean isEmptyRow(Row row, DataFormatter formatter) {
@@ -102,40 +80,56 @@ public class XlsRoutesParser {
         return isEmpty;
     }
 
-    public List<Route> parseXls(FileInputStream fis) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook(fis);
-        XSSFSheet pointsSheet = workbook.getSheet("Points");
-        XSSFSheet routesSheet = workbook.getSheet("Routes");
-        DataFormatter formatter = new DataFormatter();
-        Map<String, Point> pointsMap = new HashMap<>();
-        List<Route> routes = new ArrayList<>();
+    private Place getPlaceFromRow(Row placesRow, DataFormatter formatter) {
+        Double lat = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LAT.getIndex())));
+        Double lng = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LNG.getIndex())));
+        String locationName = formatter.formatCellValue(placesRow.getCell(PlaceColumns.LOCATION_NAME.getIndex()));
+        Double locationLat = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LOCATION_LAT.getIndex())));
+        Double locationLng = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LOCATION_LNG.getIndex())));
 
-        for (Row pointsRow : pointsSheet) {
-            if (isEmptyRow(pointsRow, formatter) || pointsRow.getRowNum() == 0) {
-                continue;
-            }
+        return Place.builder()
+                .id(formatter.formatCellValue(placesRow.getCell(PlaceColumns.ID.getIndex())))
+                .name(formatter.formatCellValue(placesRow.getCell(PlaceColumns.NAME.getIndex())))
+                .coords(new Position(lat, lng))
+                .imgUrl(formatter.formatCellValue(placesRow.getCell(PlaceColumns.IMG_URL.getIndex())))
+                .location(new Location(locationName, new Position(locationLat, locationLng)))
+                .tags(splitByComma(formatter.formatCellValue(placesRow.getCell(PlaceColumns.TAGS.getIndex()))))
+                .description(formatter.formatCellValue(placesRow.getCell(PlaceColumns.DESCRIPTION.getIndex())))
+                .build();
+    }
 
-            Point point = getPointFromRow(pointsRow, formatter);
-            pointsMap.put(point.getId(), point);
+    private Route getRouteFromRow(Row routesRow, DataFormatter formatter) {
+        Double lat = getDouble(formatter.formatCellValue(routesRow.getCell(RouteColumns.LAT.getIndex())));
+        Double lng = getDouble(formatter.formatCellValue(routesRow.getCell(RouteColumns.LNG.getIndex())));
+        return Route.builder()
+                .id(formatter.formatCellValue(routesRow.getCell(RouteColumns.ID.getIndex())))
+                .name(formatter.formatCellValue(routesRow.getCell(RouteColumns.NAME.getIndex())))
+                .points(new ArrayList<>())
+                .coords(new Position(lat, lng))
+                .imgUrl(formatter.formatCellValue(routesRow.getCell(RouteColumns.IMG_URL.getIndex())))
+                .tags(new ArrayList<>())
+                .description(formatter.formatCellValue(routesRow.getCell(RouteColumns.DESCRIPTION.getIndex())))
+                .build();
+    }
+
+    private List<String> getPlaceIdsFromRoutesRow(Row routesRow, DataFormatter formatter) {
+        String placeIds = formatter.formatCellValue(routesRow.getCell(RouteColumns.POINTS.getIndex()));
+        return splitByComma(placeIds);
+    }
+
+    private static Double getDouble(String str) {
+        Double number = null;
+        try {
+            number = Double.valueOf(str);
+        } catch (NumberFormatException e) {
+            //
         }
+        return number;
+    }
 
-        for (Row routesRow : routesSheet) {
-            if (isEmptyRow(routesRow, formatter) || routesRow.getRowNum() == 0) {
-                continue;
-            }
-
-            Route route = getRouteFromRow(routesRow, formatter);
-            routes.add(route);
-            List<String> pointIds = getPointIdsFromRoutesRow(routesRow, formatter);
-
-            pointIds.forEach(pointId -> {
-                Point point = pointsMap.get(pointId);
-                if (point != null) {
-                    route.getPoints().add(point);
-                }
-            });
-        }
-
-        return routes;
+    private List<String> splitByComma(String values) {
+        return Arrays.stream(values.split(","))
+                .map(String::strip)
+                .collect(Collectors.toList());
     }
 }

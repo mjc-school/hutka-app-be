@@ -1,11 +1,11 @@
 variable "aws_access_key" {
   # set aws access key
-  default = "AKIASBLUHOGNEK5NWFLC"
+  default = "Access key"
 }
 
 variable "aws_secret_key" {
   # set aws secret key
-  default = "73ISy0/pCyqrHXao790LJzX2WBye4YYVlWJAMBOz"
+  default = "Secret key"
 }
 
 variable "region" {
@@ -33,8 +33,8 @@ variable "api_env_stage_name" {
   default = "Prod"
 }
 
-variable "save_route_path" {
-  default = "save-route"
+variable "search_places_path" {
+  default = "search-places"
 }
 
 variable "search_routes_path" {
