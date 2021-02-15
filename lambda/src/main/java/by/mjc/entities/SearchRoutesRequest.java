@@ -11,4 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class SearchRoutesRequest {
     private List<String> tags;
+    private String city;
 }

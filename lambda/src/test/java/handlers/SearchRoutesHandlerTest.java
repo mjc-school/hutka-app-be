@@ -50,10 +50,10 @@ public class SearchRoutesHandlerTest {
 
     @ParameterizedTest(name = "#{index} - match search?")
     @MethodSource("getTagsSearchScenariosFromCsv")
-    public void testSearchByTags(List<String> csvValues) {
+    public void testSearchByTagsAndCity(List<String> csvValues) {
         List<String> routeIds = getExpectedRouteIdsForTagsSearchFromCsv(csvValues);
-        SearchRoutesRequest request = new SearchRoutesRequest(getTagsForTagsSearchFromCsv(csvValues));
-        List<Route> foundRoutes = routesService.getRoutesByTags(request);
+        SearchRoutesRequest request = new SearchRoutesRequest(getTagsForTagsSearchFromCsv(csvValues), getCityFromCsv(csvValues));
+        List<Route> foundRoutes = routesService.getRoutesByTagsAndCity(request);
         boolean allMatch = foundRoutes.stream()
                 .map(Route::getId)
                 .allMatch(routeIds::contains);
@@ -87,8 +87,12 @@ public class SearchRoutesHandlerTest {
         return TestUtils.splitBySemicolon(values.get(0));
     }
 
+    private static String getCityFromCsv(List<String> values) {
+        return values.get(2).strip();
+    }
+
     private static List<String> getExpectedRouteIdsForTagsSearchFromCsv(List<String> values) {
-        return TestUtils.splitBySemicolon(values.get(1));
+        return TestUtils.splitBySemicolon(values.get(2));
     }
 
     private static List<List<String>> getTagsSearchScenariosFromCsv() throws URISyntaxException, IOException {

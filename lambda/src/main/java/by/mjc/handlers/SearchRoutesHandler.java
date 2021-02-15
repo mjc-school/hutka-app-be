@@ -17,6 +17,6 @@ public class SearchRoutesHandler implements RequestHandler<SearchRoutesRequest, 
 
     @Override
     public List<Route> handleRequest(SearchRoutesRequest request, Context context) {
-        return routesService.getRoutesByTags(request);
+        return routesService.getRoutesByTagsAndCity(request);
     }
 }

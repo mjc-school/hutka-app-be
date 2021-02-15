@@ -95,12 +95,16 @@ public class TestUtils {
     }
 
     public static List<String> splitByComma(String values) {
+        if (values.isEmpty()) return Collections.emptyList();
+
         return Arrays.stream(values.split(",", -1))
                 .map(String::strip)
                 .collect(Collectors.toList());
     }
 
     public static List<String> splitBySemicolon(String values) {
+        if (values.isEmpty()) return Collections.emptyList();
+
         return Arrays.stream(values.split(";", -1))
                 .map(String::strip)
                 .collect(Collectors.toList());

@@ -8,7 +8,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class RoutesDao {
@@ -19,8 +18,42 @@ public class RoutesDao {
     }
 
     public void save(Route route) {
+        Route routeToSave = cloneRoute(route);
+        // Cannot add empty collection to DynamoDB
+        setEmptyCollectionsToNull(routeToSave);
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
-        mapper.save(route);
+        mapper.save(routeToSave);
+    }
+
+    private Route cloneRoute(Route route) {
+        return Route.builder()
+                .id(route.getId())
+                .name(route.getName())
+                .points(route.getPoints())
+                .coords(route.getCoords())
+                .imgUrl(route.getImgUrl())
+                .tags(route.getTags())
+                .description(route.getDescription())
+                .build();
+    }
+
+    private void setEmptyCollectionsToNull(Route route) {
+        if (isEmptyCollection(route.getTags())) {
+            route.setTags(null);
+        }
+        if (route.getPoints().isEmpty()) {
+            route.setPoints(null);
+        } else {
+            route.getPoints().forEach(point -> {
+                if (isEmptyCollection(point.getTags())) {
+                    point.setTags(null);
+                }
+            });
+        }
+    }
+
+    private <T> boolean isEmptyCollection(Collection<T> collection) {
+        return collection != null && collection.isEmpty();
     }
 
     public List<Route> getAll() {
@@ -29,36 +62,19 @@ public class RoutesDao {
         return mapper.scan(Route.class, scanExpression);
     }
 
-    private Map<String, AttributeValue> getExpressionAttributes(List<String> tags) {
-        AtomicInteger i = new AtomicInteger(1);
-        return tags.stream()
-                .collect(Collectors.toMap(
-                        tag -> String.format(":tag%d", i.getAndIncrement()),
-                        tag -> new AttributeValue().withS(tag)));
-    }
-
-    private String getTagFilterExpression(String attributeAlias) {
-        return String.format("contains(tags, %s)", attributeAlias);
-    }
-
-    private String getTagsFilterExpression(Map<String, AttributeValue> expressionAttributes) {
-        return expressionAttributes.keySet().stream()
-                .map(this::getTagFilterExpression)
-                .reduce((s1, s2) -> s1 + " OR " + s2)
-                .orElse("");
-    }
-
     public List<Route> getByTags(List<String> tags) {
-        if (tags.isEmpty()) {
+        if (isEmptyCollection(tags)) {
             return getAll();
         }
 
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
-        Map<String, AttributeValue> expressionAttributes = getExpressionAttributes(tags);
-        String filterExpression = getTagsFilterExpression(expressionAttributes);
+        // In DynamoDB "contains" function accepts single values or string sets
+        List<String> uniqueTags = tags.stream()
+                .distinct()
+                .collect(Collectors.toList());
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-                .withFilterExpression(filterExpression)
-                .withExpressionAttributeValues(expressionAttributes);
+                .withFilterExpression("contains(tags, :tags)")
+                .withExpressionAttributeValues(Map.of(":tags", new AttributeValue().withSS(uniqueTags)));
 
         return mapper.scan(Route.class, scanExpression);
     }
