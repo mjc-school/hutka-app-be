@@ -88,7 +88,7 @@ public class SearchRoutesHandlerTest {
     }
 
     private static String getCityFromCsv(List<String> values) {
-        return values.get(2).strip();
+        return values.get(1).strip();
     }
 
     private static List<String> getExpectedRouteIdsForTagsSearchFromCsv(List<String> values) {

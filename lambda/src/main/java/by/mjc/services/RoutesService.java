@@ -23,26 +23,20 @@ public class RoutesService {
     public List<Route> getRoutesByTagsAndCity(SearchRoutesRequest request) {
         List<String> tags = request.getTags();
         String city = request.getCity();
-        List<Route> routes = routesDao.getByTags(tags);
+        List<Route> routes = routesDao.getByTagsAndCity(tags, city);
 
-        if (isEmptyCollection(tags) && !city.isEmpty()) {
+        if (isEmptyCollection(tags) || city == null || city.isEmpty()) {
             return routes;
         }
 
         return routes.stream()
                 .filter(route -> !isEmptyCollection(route.getPoints()))
                 .filter(route -> hasMoreThanTwoTags(route, tags))
-                .filter(route -> containsRequestedCity(route, city))
                 .collect(Collectors.toList());
     }
 
     private <T> boolean isEmptyCollection(Collection<T> collection) {
-        return collection != null && collection.isEmpty();
-    }
-
-    private boolean containsRequestedCity(Route route, String city) {
-        return route.getPoints().stream()
-                .anyMatch(place -> place.getLocation().getName().equals(city));
+        return collection == null || collection.isEmpty();
     }
 
     private boolean hasMoreThanTwoTags(Route route, List<String> tags) {

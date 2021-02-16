@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TestUtils {
-    public static List<Route> parseRoutesFromCsv(Path placesCsvPath ,Path routesCsvPath) throws IOException {
+    public static List<Route> parseRoutesFromCsv(Path placesCsvPath, Path routesCsvPath) throws IOException {
         Map<String, Place> pointsMap = new HashMap<>();
         List<Route> routes = new ArrayList<>();
         Files.lines(placesCsvPath)
@@ -35,6 +35,7 @@ public class TestUtils {
                         Place place = pointsMap.get(placeId);
                         addPlaceToRoute(route, place);
                     });
+                    route.fillDenormalizedFields();
                 });
 
         return routes;
@@ -43,17 +44,6 @@ public class TestUtils {
     public static void addPlaceToRoute(Route route, Place place) {
         if (place != null) {
             route.getPoints().add(place);
-            addPlaceTagsToRoute(route, place);
-        }
-    }
-
-    public static void addPlaceTagsToRoute(Route route, Place place) {
-        if (place.getTags() != null) {
-            place.getTags().forEach(tag -> {
-                if (!route.getTags().contains(tag)) {
-                    route.getTags().add(tag);
-                }
-            });
         }
     }
 
@@ -85,7 +75,6 @@ public class TestUtils {
                 .points(new ArrayList<>())
                 .coords(new Position(lat, lng))
                 .imgUrl(values.get(5))
-                .tags(new ArrayList<>())
                 .description(values.get(6))
                 .build();
     }

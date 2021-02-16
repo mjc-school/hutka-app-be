@@ -49,9 +49,9 @@ public class RoutesDaoTest {
 
     @ParameterizedTest(name = "#{index} - match search?")
     @MethodSource("getTagsSearchScenariosFromCsv")
-    public void testGetByTags(List<String> csvValues) {
+    public void testGetByTagsAndCity(List<String> csvValues) {
         List<String> routeIds = getExpectedRouteIdsForTagsSearchFromCsv(csvValues);
-        List<Route> foundRoutes = routesDao.getByTags(getTagsForTagsSearchFromCsv(csvValues));
+        List<Route> foundRoutes = routesDao.getByTagsAndCity(getTagsForTagsSearchFromCsv(csvValues), getCityForTagsSearchFromCsv(csvValues));
         boolean allMatch = foundRoutes.stream()
                 .map(Route::getId)
                 .allMatch(routeIds::contains);
@@ -97,8 +97,12 @@ public class RoutesDaoTest {
         return TestUtils.splitBySemicolon(values.get(0));
     }
 
+    private static String getCityForTagsSearchFromCsv(List<String> values) {
+        return values.get(1);
+    }
+
     private static List<String> getExpectedRouteIdsForTagsSearchFromCsv(List<String> values) {
-        return TestUtils.splitBySemicolon(values.get(1));
+        return TestUtils.splitBySemicolon(values.get(2));
     }
 
     private static List<List<String>> getTagsSearchScenariosFromCsv() throws URISyntaxException, IOException {

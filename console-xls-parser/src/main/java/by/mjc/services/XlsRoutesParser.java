@@ -43,6 +43,8 @@ public class XlsRoutesParser {
                 Place place = pointsMap.get(placeId);
                 addPlaceToRoute(route, place);
             });
+
+            route.fillDenormalizedFields();
         }
 
         return routes;
@@ -51,17 +53,6 @@ public class XlsRoutesParser {
     private void addPlaceToRoute(Route route, Place place) {
         if (place != null) {
             route.getPoints().add(place);
-            addPlaceTagsToRoute(route, place);
-        }
-    }
-
-    private void addPlaceTagsToRoute(Route route, Place place) {
-        if (place.getTags() != null) {
-            place.getTags().forEach(tag -> {
-                if (!route.getTags().contains(tag)) {
-                    route.getTags().add(tag);
-                }
-            });
         }
     }
 
@@ -107,7 +98,6 @@ public class XlsRoutesParser {
                 .points(new ArrayList<>())
                 .coords(new Position(lat, lng))
                 .imgUrl(formatter.formatCellValue(routesRow.getCell(RouteColumns.IMG_URL.getIndex())))
-                .tags(new ArrayList<>())
                 .description(formatter.formatCellValue(routesRow.getCell(RouteColumns.DESCRIPTION.getIndex())))
                 .build();
     }

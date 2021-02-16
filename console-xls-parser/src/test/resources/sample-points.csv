@@ -1,4 +1,4 @@
-id, name, lat, lng, imgUrl, locationMame, locationLat, locationLng, tags, description
+id, name, lat, lng, imgUrl, locationName, locationLat, locationLng, tags, description
 1, Place name 1, 55.12,-33.22, url1,, 55.12, -33.22, Архитектура,
 2, Place name 2,,, url2,,55.12, -33.22, Архитектура; еда,
 3, Название места 3,,, url3,, 48.15, -16.23, История; Архитектура,

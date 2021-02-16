@@ -19,8 +19,8 @@ public class RoutesDao {
 
     public void save(Route route) {
         Route routeToSave = cloneRoute(route);
-        // Cannot add empty collection to DynamoDB
-        setEmptyCollectionsToNull(routeToSave);
+        // Cannot add empty collection or collection that contains empty string to DynamoDB
+        fixCollections(routeToSave);
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
         mapper.save(routeToSave);
     }
@@ -34,26 +34,40 @@ public class RoutesDao {
                 .imgUrl(route.getImgUrl())
                 .tags(route.getTags())
                 .description(route.getDescription())
+                .cities(route.getCities())
                 .build();
     }
 
-    private void setEmptyCollectionsToNull(Route route) {
-        if (isEmptyCollection(route.getTags())) {
-            route.setTags(null);
-        }
+    private void fixCollections(Route route) {
+        route.setTags(getFixedCollection(route.getTags()));
+        route.setCities(getFixedCollection(route.getCities()));
+
         if (route.getPoints().isEmpty()) {
             route.setPoints(null);
         } else {
             route.getPoints().forEach(point -> {
-                if (isEmptyCollection(point.getTags())) {
-                    point.setTags(null);
-                }
+                point.setTags(getFixedCollection(point.getTags()));
             });
         }
     }
 
+    private List<String> getFixedCollection(List<String> list) {
+        if (isEmptyCollection(list)) {
+            return null;
+        }
+
+        return getListWithoutEmptyStrings(list);
+    }
+
+    private List<String> getListWithoutEmptyStrings(List<String> list) {
+        return list.stream()
+                .filter(Objects::nonNull)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+    }
+
     private <T> boolean isEmptyCollection(Collection<T> collection) {
-        return collection != null && collection.isEmpty();
+        return collection == null || collection.isEmpty();
     }
 
     public List<Route> getAll() {
@@ -62,8 +76,8 @@ public class RoutesDao {
         return mapper.scan(Route.class, scanExpression);
     }
 
-    public List<Route> getByTags(List<String> tags) {
-        if (isEmptyCollection(tags)) {
+    public List<Route> getByTagsAndCity(List<String> tags, String city) {
+        if (isEmptyCollection(tags) || city == null || city.isEmpty()) {
             return getAll();
         }
 
@@ -72,9 +86,12 @@ public class RoutesDao {
         List<String> uniqueTags = tags.stream()
                 .distinct()
                 .collect(Collectors.toList());
+        Map<String, AttributeValue> expressionAttributes = Map.of(
+                ":tags", new AttributeValue().withSS(uniqueTags),
+                ":city", new AttributeValue().withS(city));
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-                .withFilterExpression("contains(tags, :tags)")
-                .withExpressionAttributeValues(Map.of(":tags", new AttributeValue().withSS(uniqueTags)));
+                .withFilterExpression("contains(tags, :tags) AND contains(cities, :city)")
+                .withExpressionAttributeValues(expressionAttributes);
 
         return mapper.scan(Route.class, scanExpression);
     }
@@ -86,7 +103,9 @@ public class RoutesDao {
         List<Route> routes = mapper.scan(Route.class, scanExpression);
         Set<Place> places = new HashSet<>();
         routes.forEach(route -> {
-            places.addAll(route.getPoints());
+            if (route.getPoints() != null) {
+                places.addAll(route.getPoints());
+            }
         });
         return new ArrayList<>(places);
     }

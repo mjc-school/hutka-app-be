@@ -1,8 +1,10 @@
 tags, city, expected routeIds, comments
-История; Несуществующий тег,,,                     only one tag matches
-Архитектура; еда,, 1; 2,                           routes that contains one of this tags
-,, 1; 2; 3; 4,                                        empty search returns all routes
-История; Архитектура; Еда,, 1; 2; 3; 6,            three tags
-stub; stub; stub; История; Еда,, 1; 2,             tags after 2 position
-abc; def,,,                                        no such tags
-Железная дорога, Дзержинск, 4                      filter by city
+История; Несуществующий тег,Брест,3,only one tag matches
+Архитектура; еда,Молодечно,1,routes that contains one of this tags
+,, 1; 2; 3; 4,empty search returns all routes
+История; Архитектура; еда,Минск,1,three tags
+stub; stub; stub; История; еда,Молодечно,"",tags after 2 position
+abc; def,,1; 2; 3; 4,no such tags
+Железная дорога, Дзержинск, 4,filter by city
+"История, Природа",Минск,,no routes through Minsk with such tags
+"История, еда",Брест,1,route that contains two tags and city
