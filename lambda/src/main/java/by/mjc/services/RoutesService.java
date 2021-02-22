@@ -42,9 +42,8 @@ public class RoutesService {
     private boolean hasMoreThanTwoTags(Route route, List<String> tags) {
         long numberOfTags = route.getTags().stream()
                 .filter(tags::contains)
-                .limit(2)
                 .count();
 
-        return numberOfTags == 2;
+        return numberOfTags >= 2;
     }
 }

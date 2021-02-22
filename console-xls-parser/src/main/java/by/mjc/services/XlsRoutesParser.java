@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 public class XlsRoutesParser {
     public List<Route> parseXls(FileInputStream fis) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
-        XSSFSheet placesSheet = workbook.getSheet("Places");
-        XSSFSheet routesSheet = workbook.getSheet("Routes");
+        XSSFSheet placesSheet = workbook.getSheet("Points");
+        XSSFSheet routesSheet = workbook.getSheet("routes");
         DataFormatter formatter = new DataFormatter();
         Map<String, Place> pointsMap = new HashMap<>();
         List<Route> routes = new ArrayList<>();
@@ -34,19 +34,23 @@ public class XlsRoutesParser {
             if (isEmptyRow(routesRow, formatter) || routesRow.getRowNum() == 0) {
                 continue;
             }
-
+            routesSheet.getMergedRegions();
             Route route = getRouteFromRow(routesRow, formatter);
-            routes.add(route);
+            if (route.getId() != null && !route.getId().equals("")) {
+                routes.add(route);
+            }
             List<String> placeIds = getPlaceIdsFromRoutesRow(routesRow, formatter);
 
             placeIds.forEach(placeId -> {
                 Place place = pointsMap.get(placeId);
-                addPlaceToRoute(route, place);
+                if (route.getId() != null && !route.getId().equals("")) {
+                    addPlaceToRoute(route, place);
+                } else {
+                    addPlaceToRoute(routes.get(routes.size() - 1), place);
+                }
             });
-
-            route.fillDenormalizedFields();
         }
-
+        routes.forEach(Route::fillDenormalizedFields);
         return routes;
     }
 
@@ -72,8 +76,8 @@ public class XlsRoutesParser {
     }
 
     private Place getPlaceFromRow(Row placesRow, DataFormatter formatter) {
-        Double lat = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LAT.getIndex())));
-        Double lng = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LNG.getIndex())));
+//        Double lat = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LAT.getIndex())));
+//        Double lng = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LNG.getIndex())));
         String locationName = formatter.formatCellValue(placesRow.getCell(PlaceColumns.LOCATION_NAME.getIndex()));
         Double locationLat = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LOCATION_LAT.getIndex())));
         Double locationLng = getDouble(formatter.formatCellValue(placesRow.getCell(PlaceColumns.LOCATION_LNG.getIndex())));
@@ -81,7 +85,7 @@ public class XlsRoutesParser {
         return Place.builder()
                 .id(formatter.formatCellValue(placesRow.getCell(PlaceColumns.ID.getIndex())))
                 .name(formatter.formatCellValue(placesRow.getCell(PlaceColumns.NAME.getIndex())))
-                .coords(new Position(lat, lng))
+//                .coords(new Position(lat, lng))
                 .imgUrl(formatter.formatCellValue(placesRow.getCell(PlaceColumns.IMG_URL.getIndex())))
                 .location(new Location(locationName, new Position(locationLat, locationLng)))
                 .tags(splitByComma(formatter.formatCellValue(placesRow.getCell(PlaceColumns.TAGS.getIndex()))))
@@ -90,13 +94,15 @@ public class XlsRoutesParser {
     }
 
     private Route getRouteFromRow(Row routesRow, DataFormatter formatter) {
-        Double lat = getDouble(formatter.formatCellValue(routesRow.getCell(RouteColumns.LAT.getIndex())));
-        Double lng = getDouble(formatter.formatCellValue(routesRow.getCell(RouteColumns.LNG.getIndex())));
+//        Double lat = getDouble(formatter.formatCellValue(routesRow.getCell(RouteColumns.LAT.getIndex())));
+//        Double lng = getDouble(formatter.formatCellValue(routesRow.getCell(RouteColumns.LNG.getIndex())));
         return Route.builder()
                 .id(formatter.formatCellValue(routesRow.getCell(RouteColumns.ID.getIndex())))
                 .name(formatter.formatCellValue(routesRow.getCell(RouteColumns.NAME.getIndex())))
                 .points(new ArrayList<>())
-                .coords(new Position(lat, lng))
+                .time(formatter.formatCellValue(routesRow.getCell(RouteColumns.TIME.getIndex())))
+                .length(formatter.formatCellValue(routesRow.getCell(RouteColumns.LENGTH.getIndex())))
+//                .coords(new Position(lat, lng))
                 .imgUrl(formatter.formatCellValue(routesRow.getCell(RouteColumns.IMG_URL.getIndex())))
                 .description(formatter.formatCellValue(routesRow.getCell(RouteColumns.DESCRIPTION.getIndex())))
                 .build();

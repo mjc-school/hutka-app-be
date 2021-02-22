@@ -56,7 +56,7 @@ public class SearchRoutesHandlerTest {
         List<Route> foundRoutes = routesService.getRoutesByTagsAndCity(request);
         boolean allMatch = foundRoutes.stream()
                 .map(Route::getId)
-                .allMatch(routeIds::contains);
+                .allMatch(routeIds::contains) && routeIds.size() == foundRoutes.size();
         assertTrue(allMatch);
     }
 

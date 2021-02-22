@@ -32,6 +32,10 @@ public class Route {
     private List<String> tags;
     @Getter(onMethod = @__({@DynamoDBAttribute}))
     private String description;
+    @Getter(onMethod = @__({@DynamoDBAttribute}))
+    private String time;
+    @Getter(onMethod = @__({@DynamoDBAttribute}))
+    private String length;
     @Getter(onMethod = @__({@DynamoDBAttribute, @JsonIgnore}))
     private List<String> cities;
 

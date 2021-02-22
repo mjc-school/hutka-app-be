@@ -8,3 +8,4 @@ abc; def,,1; 2; 3; 4,no such tags
 Железная дорога, Дзержинск, 4,filter by city
 "История, Природа",Минск,,no routes through Minsk with such tags
 "История, еда",Брест,1,route that contains two tags and city
+"История, еда",Солигорск, 1, ARAD scanario
