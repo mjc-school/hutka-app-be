@@ -1,6 +1,7 @@
 package by.mjc.services;
 
 import by.mjc.dao.RoutesDao;
+import by.mjc.entities.Location;
 import by.mjc.entities.Place;
 import by.mjc.entities.Route;
 import by.mjc.entities.SearchRoutesRequest;
@@ -16,8 +17,8 @@ public class RoutesService {
         this.routesDao = routesDao;
     }
 
-    public List<Place> getAllPlaces() {
-        return routesDao.getAllPlaces();
+    public List<Location> getAllLocations() {
+        return routesDao.getAllLocations();
     }
 
     public List<Route> getRoutesByTagsAndCity(SearchRoutesRequest request) {

@@ -120,7 +120,7 @@ resource "aws_lambda_function" "search_places_lambda" {
   runtime = var.lambda_runtime
   filename = var.lambda_payload_filename
   role = aws_iam_role.write_role.arn
-  handler = "by.mjc.handlers.SearchPlacesHandler"
+  handler = "by.mjc.handlers.SearchLocationsHandler"
   timeout = var.lambda_timeout
   memory_size = var.lambda_memory
 }

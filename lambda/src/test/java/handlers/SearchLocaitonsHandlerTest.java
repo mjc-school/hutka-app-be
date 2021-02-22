@@ -1,7 +1,7 @@
 package handlers;
 
 import by.mjc.dao.RoutesDao;
-import by.mjc.entities.Place;
+import by.mjc.entities.Location;
 import by.mjc.entities.Route;
 import by.mjc.services.RoutesService;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -22,7 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class SearchPlacesHandlerTest {
+public class SearchLocaitonsHandlerTest {
     private static AmazonDynamoDBLocal amazonDynamoDBLocal;
     private static RoutesService routesService;
     private static RoutesDao routesDao;
@@ -35,8 +35,8 @@ public class SearchPlacesHandlerTest {
         routesDao = new RoutesDao(dynamoDB);
         routesService = new RoutesService(routesDao);
         createTable(dynamoDB);
-        Path placesCsvPath = Path.of(TestUtils.getUriForResourcePath(SearchPlacesHandlerTest.class, "sample-points.csv"));
-        Path routesCsvPath = Path.of(TestUtils.getUriForResourcePath(SearchPlacesHandlerTest.class, "sample-routes.csv"));
+        Path placesCsvPath = Path.of(TestUtils.getUriForResourcePath(SearchLocaitonsHandlerTest.class, "sample-points.csv"));
+        Path routesCsvPath = Path.of(TestUtils.getUriForResourcePath(SearchLocaitonsHandlerTest.class, "sample-routes.csv"));
         saveData(TestUtils.parseRoutesFromCsv(placesCsvPath, routesCsvPath));
     }
 
@@ -47,7 +47,7 @@ public class SearchPlacesHandlerTest {
 
     @Test
     public void testSearchPlaces() {
-        List<Place> places = routesService.getAllPlaces();
+        List<Location> places = routesService.getAllLocations();
         assertFalse(places.isEmpty());
     }
 

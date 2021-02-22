@@ -1,5 +1,6 @@
 package by.mjc.dao;
 
+import by.mjc.entities.Location;
 import by.mjc.entities.Place;
 import by.mjc.entities.Route;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -120,18 +121,18 @@ public class RoutesDao {
                 .orElse("");
     }
 
-    public List<Place> getAllPlaces() {
+    public List<Location> getAllLocations() {
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
         scanExpression.withProjectionExpression("points");
         List<Route> routes = mapper.scan(Route.class, scanExpression);
-        Set<Place> places = new HashSet<>();
+        Set<Location> locations = new HashSet<>();
         routes.forEach(route -> {
             if (route.getPoints() != null) {
-                places.addAll(route.getPoints());
+                locations.addAll(route.getPoints().stream().map(Place::getLocation).collect(Collectors.toList()));
             }
         });
-        return new ArrayList<>(places);
+        return new ArrayList<>(locations);
     }
 
     public void delete(Route route) {

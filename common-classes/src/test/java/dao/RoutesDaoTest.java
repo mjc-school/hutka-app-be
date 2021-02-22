@@ -1,7 +1,7 @@
 package dao;
 
 import by.mjc.dao.RoutesDao;
-import by.mjc.entities.Place;
+import by.mjc.entities.Location;
 import by.mjc.entities.Route;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
@@ -66,7 +66,7 @@ public class RoutesDaoTest {
 
     @Test
     public void testGetAllPlaces() {
-        List<Place> places = routesDao.getAllPlaces();
+        List<Location> places = routesDao.getAllLocations();
         assertFalse(places.isEmpty());
     }
 
