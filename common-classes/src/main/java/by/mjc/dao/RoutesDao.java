@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class RoutesDao {
@@ -82,18 +83,41 @@ public class RoutesDao {
         }
 
         DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
-        // In DynamoDB "contains" function accepts single values or string sets
-        List<String> uniqueTags = tags.stream()
-                .distinct()
-                .collect(Collectors.toList());
-        Map<String, AttributeValue> expressionAttributes = Map.of(
-                ":tags", new AttributeValue().withSS(uniqueTags),
-                ":city", new AttributeValue().withS(city));
+        Map<String, AttributeValue> tagsExpressionAttributes = getExpressionAttributes(":tag", tags);
+        Map<String, AttributeValue> cityExpressionAttributes = getExpressionAttributes(":city", List.of(city));
+        String tagsFilterExpression = getOrFilterExpression("tags", tagsExpressionAttributes);
+        String cityFilterExpression = getOrFilterExpression("cities", cityExpressionAttributes);
+        String allExpression = "(TAGS) AND (CITY)"
+                .replace("TAGS", tagsFilterExpression)
+                .replace("CITY", cityFilterExpression);
+        Map<String, AttributeValue> allExpressionAttributes = new HashMap<>();
+        allExpressionAttributes.putAll(tagsExpressionAttributes);
+        allExpressionAttributes.putAll(cityExpressionAttributes);
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-                .withFilterExpression("contains(tags, :tags) AND contains(cities, :city)")
-                .withExpressionAttributeValues(expressionAttributes);
+                .withFilterExpression(allExpression)
+                .withExpressionAttributeValues(allExpressionAttributes);
 
         return mapper.scan(Route.class, scanExpression);
+
+    }
+
+    private Map<String, AttributeValue> getExpressionAttributes(String field, List<String> tags) {
+        AtomicInteger i = new AtomicInteger(1);
+        return tags.stream()
+                .collect(Collectors.toMap(
+                        tag -> String.format(field + "%d", i.getAndIncrement()),
+                        tag -> new AttributeValue().withS(tag)));
+    }
+
+    private String getFilterExpression(String field, String attributeAlias) {
+        return String.format("contains(" + field + ", %s)", attributeAlias);
+    }
+
+    private String getOrFilterExpression(String field, Map<String, AttributeValue> expressionAttributes) {
+        return expressionAttributes.keySet().stream()
+                .map(item -> this.getFilterExpression(field, item))
+                .reduce((s1, s2) -> s1 + " OR " + s2)
+                .orElse("");
     }
 
     public List<Place> getAllPlaces() {
