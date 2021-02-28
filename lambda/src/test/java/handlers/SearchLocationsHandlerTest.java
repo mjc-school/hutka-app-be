@@ -22,7 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class SearchLocaitonsHandlerTest {
+public class SearchLocationsHandlerTest {
     private static AmazonDynamoDBLocal amazonDynamoDBLocal;
     private static RoutesService routesService;
     private static RoutesDao routesDao;
@@ -35,8 +35,8 @@ public class SearchLocaitonsHandlerTest {
         routesDao = new RoutesDao(dynamoDB);
         routesService = new RoutesService(routesDao);
         createTable(dynamoDB);
-        Path placesCsvPath = Path.of(TestUtils.getUriForResourcePath(SearchLocaitonsHandlerTest.class, "sample-points.csv"));
-        Path routesCsvPath = Path.of(TestUtils.getUriForResourcePath(SearchLocaitonsHandlerTest.class, "sample-routes.csv"));
+        Path placesCsvPath = Path.of(TestUtils.getUriForResourcePath(SearchLocationsHandlerTest.class, "sample-points.csv"));
+        Path routesCsvPath = Path.of(TestUtils.getUriForResourcePath(SearchLocationsHandlerTest.class, "sample-routes.csv"));
         saveData(TestUtils.parseRoutesFromCsv(placesCsvPath, routesCsvPath));
     }
 

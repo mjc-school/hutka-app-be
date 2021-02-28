@@ -4,8 +4,10 @@ tags, city, expected routeIds, comments
 ,, 1; 2; 3; 4,empty search returns all routes
 История; Архитектура; еда,Минск,1,three tags
 stub; stub; stub; История; еда,Молодечно,1,tags after 2 position
-abc; def,,1; 2; 3; 4,no such tags
+abc; def,,,no such tags
 Железная дорога, Дзержинск, ,filter by city
 История; Природа,Минск,,no routes through Minsk with such tags
 История; еда,Брест,1,route that contains two tags and city
 История; еда,Молодечно, 1, ARAD scanario
+"Архитектура, Еда",,1,Search without city
+,Дзержинск,4,Search without tags
