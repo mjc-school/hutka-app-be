@@ -103,7 +103,7 @@ public class RoutesDao {
 
     private Map<String, AttributeValue> getExpressionAttributes(String field, List<String> list) {
         AtomicInteger i = new AtomicInteger(1);
-        return list.stream()
+        return list == null ? new HashMap<>() : list.stream()
                 .collect(Collectors.toMap(
                         tag -> String.format(field + "%d", i.getAndIncrement()),
                         tag -> new AttributeValue().withS(tag)));
@@ -159,8 +159,4 @@ public class RoutesDao {
         return new ArrayList<>(locations);
     }
 
-    public void delete(Route route) {
-        DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
-        mapper.delete(route);
-    }
 }

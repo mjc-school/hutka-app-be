@@ -27,7 +27,9 @@ public class XlsRoutesParser {
             }
 
             Place place = getPlaceFromRow(placesRow, formatter);
-            pointsMap.put(place.getId(), place);
+            if (place.getId() != null && !place.getId().equals("") && place.getName() != null && !place.getName().equals("")) {
+                pointsMap.put(place.getId(), place);
+            }
         }
 
         for (Row routesRow : routesSheet) {
@@ -45,7 +47,7 @@ public class XlsRoutesParser {
                 Place place = pointsMap.get(placeId);
                 if (route.getId() != null && !route.getId().equals("")) {
                     addPlaceToRoute(route, place);
-                } else {
+                } else if (!routes.isEmpty()) {
                     addPlaceToRoute(routes.get(routes.size() - 1), place);
                 }
             });
@@ -86,8 +88,10 @@ public class XlsRoutesParser {
                 .id(formatter.formatCellValue(placesRow.getCell(PlaceColumns.ID.getIndex())))
                 .name(formatter.formatCellValue(placesRow.getCell(PlaceColumns.NAME.getIndex())))
 //                .coords(new Position(lat, lng))
+                .coords(new Position(locationLat, locationLng))
                 .imgUrl(formatter.formatCellValue(placesRow.getCell(PlaceColumns.IMG_URL.getIndex())))
-                .location(new Location(locationName, new Position(locationLat, locationLng)))
+//                .location(new Location(locationName, new Position(locationLat, locationLng)))
+                .location(Location.builder().name(locationName).build())
                 .tags(splitByComma(formatter.formatCellValue(placesRow.getCell(PlaceColumns.TAGS.getIndex()))))
                 .description(formatter.formatCellValue(placesRow.getCell(PlaceColumns.DESCRIPTION.getIndex())))
                 .build();
