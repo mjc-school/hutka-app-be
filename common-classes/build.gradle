@@ -1,0 +1,25 @@
+
+repositories {
+    maven {
+        url "https://s3-us-west-2.amazonaws.com/dynamodb-local/release"
+    }
+}
+
+dependencies {
+    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.670'
+    testCompile 'com.amazonaws:DynamoDBLocal:1.13.5'
+}
+
+task copyNativeDeps(type: Copy) {
+    from(configurations.testCompile) {
+        include "*.dylib"
+        include "*.so"
+        include "*.dll"
+    }
+    into 'build/libs'
+}
+
+test.dependsOn copyNativeDeps
+test.doFirst {
+    systemProperty "java.library.path", 'build/libs'
+}

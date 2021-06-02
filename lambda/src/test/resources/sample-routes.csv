@@ -1,0 +1,5 @@
+id, name, points, lat, lng, imgUrl, description
+1, route1,1; 2; 3, 11.22, -6.34, url,some description1
+2, тестовый2,1; 4; 5; 8,"","", url,какое никакое описание2
+3,,,,,,
+4,,7;8;9,,,,
